@@ -6,15 +6,27 @@ import android.content.Intent;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 public class MyPhoneReceiver extends BroadcastReceiver {
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
 
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         telephonyManager.listen(new PhoneStateListener() {
 
-            
+            @Override
+            public void onCallStateChanged(int state, String incomingNumber) {
+                super.onCallStateChanged(state, incomingNumber);
 
+                System.out.println("incoming number: " + incomingNumber);
+
+                LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
+                Intent intentToMain = new Intent("my.result.receiver");
+                intentToMain.putExtra("incomingNumber", incomingNumber);
+                manager.sendBroadcast(intentToMain);
+
+            }
         }, PhoneStateListener.LISTEN_CALL_STATE);
 
     }
